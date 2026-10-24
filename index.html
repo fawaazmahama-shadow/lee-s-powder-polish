@@ -86,6 +86,18 @@ footer{border-top:1px solid var(--line);background:var(--bg2);padding:2.5rem 1.2
 .sl{border:1px solid var(--gold);padding:.4rem .9rem;border-radius:99px;text-decoration:none;color:var(--fg);font-size:.92rem;white-space:nowrap}.sl:hover{background:var(--gold);color:var(--on)}
 @media(max-width:760px){.bar{flex-wrap:wrap}nav{order:3;width:100%;justify-content:space-between}}
 .st{color:var(--gold);letter-spacing:.12em;font-size:1.1rem}.tq{font-family:"Bodoni Moda",Georgia,serif;font-size:1.15rem;margin:.5rem 0}
+
+.rsum{display:flex;align-items:center;gap:1rem;flex-wrap:wrap;margin:.4rem 0 1.6rem}.rsum .big{font-family:"Bodoni Moda",Georgia,serif;font-size:3rem;line-height:1}.rsum .st{font-size:1.3rem}
+.rgrid{display:grid;gap:1.2rem;grid-template-columns:repeat(auto-fill,minmax(260px,1fr))}
+.rcard{background:var(--bg2);border:1px solid var(--line);padding:1.4rem;display:flex;flex-direction:column}.rcard .tq{flex:1}.rcard p{margin:0}.rcard .who{color:var(--mut);font-size:.92rem;margin-top:.5rem}
+.rcard img{width:100%;aspect-ratio:4/3;object-fit:cover;margin-bottom:.8rem;display:block;border:1px solid var(--line)}
+#rform{margin-top:1rem;width:100%}#rform label{min-width:0}#rform input:not([type=radio]),#rform textarea{width:100%;min-width:0}fieldset{border:0;padding:0;margin:0;min-width:0}legend{font-weight:500;padding:0;margin-bottom:.3rem}
+.rate{display:flex;flex-direction:row-reverse;justify-content:flex-end;gap:.1rem}
+.rate input{position:absolute;opacity:0;width:1px;height:1px;pointer-events:none}
+.rate label{display:block;font-size:2.2rem;line-height:1;color:var(--line);cursor:pointer;padding:0 .1rem;font-weight:400}
+.rate input:checked~label,.rate label:hover,.rate label:hover~label{color:var(--gold)}
+.rate input:focus-visible+label{outline:2px solid var(--gold);outline-offset:2px}
+#pprev{display:none;width:120px;aspect-ratio:1;object-fit:cover;border:1px solid var(--gold)}
 </style>
 </head>
 <body>
@@ -111,15 +123,8 @@ footer{border-top:1px solid var(--line);background:var(--bg2);padding:2.5rem 1.2
 <div class="card"><h3>Skincare</h3><p>Products you can buy and collect on campus.</p></div>
 </div></section>
 <section id="tsec" hidden><h2>What customers say</h2>
-<div class="grid" id="tgrid"></div>
-<div class="btns"><button class="btn" id="tadd" type="button">Share your experience</button></div>
-<form id="tf" hidden style="margin-top:1.2rem">
-<label>Your first name<input name="n" maxlength="60" required></label>
-<label>Your rating<select name="r"><option value="5">★★★★★ Loved it</option><option value="4">★★★★☆ Very good</option><option value="3">★★★☆☆ Good</option><option value="2">★★☆☆☆ Fair</option><option value="1">★☆☆☆☆ Poor</option></select></label>
-<label>Your review<textarea name="q" rows="4" minlength="5" maxlength="400" required></textarea></label>
-<label>Add a photo of your work (optional)<input name="p" type="file" accept="image/*"></label>
-<input name="website" tabindex="-1" autocomplete="off" aria-hidden="true" style="position:absolute;left:-9999px">
-<button class="btn gold" type="submit">Send review</button><p class="note" id="tmsg" role="status"></p></form></section>
+<div class="grid" id="hgrid"></div>
+<div class="btns"><a class="btn" href="#reviews">Read all reviews or leave yours</a></div></section>
 <section><h2>Opening hours</h2><p data-s="hours" style="font-size:1.25rem;margin:0 0 .4rem">Mon to Sun, 8am to 10pm</p>
 <p class="note">Message us on WhatsApp to confirm your slot.</p>
 <div class="btns"><a class="btn gold" href="https://wa.me/233596139168?text=Hello%20Lee%E2%80%99s%20Powder%20%26%20Polish%2C%20I%E2%80%99d%20like%20to%20book." target="_blank" rel="noopener">Chat on WhatsApp</a>
@@ -157,6 +162,27 @@ footer{border-top:1px solid var(--line);background:var(--bg2);padding:2.5rem 1.2
 <p class="note">Snapchat: Khaleesi💕</p></section>
 </div>
 
+<div class="page" id="reviews">
+<section style="border-bottom:0"><h2>Customer reviews</h2>
+<div class="rsum" id="rsum" hidden></div>
+<div class="rgrid" id="rgrid"><p class="note">Loading reviews…</p></div></section>
+<section id="rwrite"><h2>Leave a review</h2>
+<p class="note" style="max-width:56ch">Tell us how your visit went. Add a photo of your nails, lashes or makeup if you like. Lee reads every review before it appears on the site.</p>
+<form id="rform">
+<label>Your first name<input name="n" maxlength="60" required autocomplete="given-name"></label>
+<fieldset><legend>Your rating</legend><div class="rate">
+<input type="radio" name="r" id="r5" value="5" required><label for="r5" title="5 stars" aria-label="5 stars">★</label>
+<input type="radio" name="r" id="r4" value="4"><label for="r4" title="4 stars" aria-label="4 stars">★</label>
+<input type="radio" name="r" id="r3" value="3"><label for="r3" title="3 stars" aria-label="3 stars">★</label>
+<input type="radio" name="r" id="r2" value="2"><label for="r2" title="2 stars" aria-label="2 stars">★</label>
+<input type="radio" name="r" id="r1" value="1"><label for="r1" title="1 star" aria-label="1 star">★</label>
+</div></fieldset>
+<label>Your review<textarea name="q" rows="4" minlength="5" maxlength="400" required placeholder="What did you get done, and how did it turn out?"></textarea></label>
+<label>Add a photo (optional)<input name="p" id="pfile" type="file" accept="image/*"></label>
+<img id="pprev" alt="Preview of your photo">
+<input name="website" tabindex="-1" autocomplete="off" aria-hidden="true" style="position:absolute;left:-9999px">
+<button class="btn gold" type="submit">Send review</button><p class="note" id="tmsg" role="status"></p></form></section>
+</div>
 <div class="page" id="book">
 <section><h2>Book an appointment</h2>
 <p class="note">Fill this in and it opens WhatsApp with your details ready to send.</p>
@@ -200,12 +226,13 @@ footer{border-top:1px solid var(--line);background:var(--bg2);padding:2.5rem 1.2
 </div></footer>
 
 <script>
+var SUPABASE_URL="https://nuwkbazgurvokrtuxpfo.supabase.co",SUPABASE_KEY="sb_publishable_lJKvl1NROvMtALbSkDkUag_X3Rhgsvk";
 var WANUM="233596139168",OLDNUM="233596139168";
-var pages=["home","services","shop","about","book"];
-function route(){var h=(location.hash||"#home").slice(1),sc=0;if(h=="reviews"){h="home";sc=1}if(pages.indexOf(h)<0)h="home";
+var pages=["home","services","shop","about","reviews","book"];
+function route(){var h=(location.hash||"#home").slice(1);if(pages.indexOf(h)<0)h="home";
 pages.forEach(function(p){document.getElementById(p).classList.toggle("on",p===h)});
 document.querySelectorAll("nav a").forEach(function(a){a.classList.toggle("on",a.getAttribute("href")==="#"+h)});
-window.scrollTo(0,0);if(sc){var t=document.getElementById("tsec");if(t&&!t.hidden)t.scrollIntoView()}}
+window.scrollTo(0,0)}
 window.addEventListener("hashchange",route);route();
 var items=[["Face cleanser","Daily skin reset"],["Moisturiser","Hydration that lasts"],["Body care","Soft, glowing skin"],["Lip care","Smooth, nourished lips"]];
 document.getElementById("products").innerHTML=items.map(function(i){return '<div class="card"><div class="ph" style="aspect-ratio:1;margin-bottom:1rem">Add product photo</div><h3>'+i[0]+'</h3><p>'+i[1]+'</p><div class="btns"><a class="btn" href="https://wa.me/233596139168?text='+encodeURIComponent('Hello, I’d like to order: '+i[0])+'" target="_blank" rel="noopener">Order on WhatsApp</a></div></div>'}).join("");
@@ -241,30 +268,51 @@ if(s.price){var p=document.createElement("strong");p.style.color="var(--gold)";p
 var g=await fetch(SUPABASE_URL+"/rest/v1/gallery?select=*&active=eq.true&order=created_at.desc",{headers:hd});
 if(g.ok){var gl=await g.json(),gb=document.querySelector(".gal");if(gl.length&&gb){gb.innerHTML="";gl.forEach(function(x){var im=document.createElement("img");im.src=SUPABASE_URL+"/storage/v1/object/public/product-images/"+encodeURIComponent(x.image_path);im.alt="Nails and beauty work by Lee’s Powder & Polish";im.loading="lazy";gb.appendChild(im)})}}}catch(e){}})();
 
-(async function(){try{if(SUPABASE_URL.indexOf("PASTE")==0)return;var hd={apikey:SUPABASE_KEY,Authorization:"Bearer "+SUPABASE_KEY};
-document.getElementById("tsec").hidden=false;
-var base=SUPABASE_URL+"/rest/v1/testimonials?status=eq.approved&order=created_at.desc&limit=12&select=",r=await fetch(base+"name,quote,rating,image_path,image_bucket",{headers:hd});
-if(!r.ok)r=await fetch(base+"name,quote,rating,image_path",{headers:hd});
-var box=document.getElementById("tgrid"),l=r.ok?await r.json():[];
-if(!l.length){var em=document.createElement("p");em.className="note";em.textContent="Be the first to share your experience.";box.appendChild(em)}
-l.forEach(function(t){var c=document.createElement("div");c.className="card";
-if(t.image_path){var im=document.createElement("img");im.src=SUPABASE_URL+"/storage/v1/object/public/"+(t.image_bucket||"product-images")+"/"+encodeURIComponent(t.image_path);im.alt="Work for "+t.name;im.loading="lazy";im.style.cssText="width:100%;aspect-ratio:4/3;object-fit:cover;margin-bottom:.8rem;display:block";c.appendChild(im)}
-var s=document.createElement("div");s.className="st";s.setAttribute("aria-label",t.rating+" out of 5 stars");s.textContent="★".repeat(t.rating)+"☆".repeat(5-t.rating);
-var q=document.createElement("p");q.className="tq";q.textContent="“"+t.quote+"”";var n=document.createElement("p");n.textContent=t.name;n.style.margin="0";
-c.appendChild(s);c.appendChild(q);c.appendChild(n);box.appendChild(c)});
-document.getElementById("tadd").onclick=function(){var f=document.getElementById("tf");f.hidden=!f.hidden};
-document.getElementById("tf").addEventListener("submit",async function(e){e.preventDefault();var f=e.target,m=document.getElementById("tmsg"),b=f.querySelector("button");
-if(f.website.value){m.textContent="Thank you! Lee will read your review before it appears.";f.hidden=true;return}
-b.disabled=true;var ok=false,path=null,bad=false;
+(async function(){
+var hd={apikey:SUPABASE_KEY,Authorization:"Bearer "+SUPABASE_KEY},live=SUPABASE_URL.indexOf("PASTE")!==0;
+function stars(n){return "★".repeat(n)+"☆".repeat(5-n)}
+function card(t){var c=document.createElement("div");c.className="rcard";
+if(t.image_path){var im=document.createElement("img");im.src=SUPABASE_URL+"/storage/v1/object/public/"+(t.image_bucket||"product-images")+"/"+encodeURIComponent(t.image_path);im.alt="Photo from "+t.name+"’s visit";im.loading="lazy";c.appendChild(im)}
+var s=document.createElement("div");s.className="st";s.setAttribute("aria-label",t.rating+" out of 5 stars");s.textContent=stars(t.rating);
+var q=document.createElement("p");q.className="tq";q.textContent="“"+t.quote+"”";
+var w=document.createElement("p");w.className="who";var d=t.created_at?new Date(t.created_at):null;
+w.textContent=t.name+(d&&!isNaN(d)?", "+d.toLocaleDateString("en-GB",{month:"short",year:"numeric"}):"");
+c.appendChild(s);c.appendChild(q);c.appendChild(w);return c}
+function note(box,txt){box.innerHTML="";var p=document.createElement("p");p.className="note";p.textContent=txt;box.appendChild(p)}
+var list=[],ok=false;
+if(live){try{var base=SUPABASE_URL+"/rest/v1/testimonials?status=eq.approved&order=created_at.desc&limit=200&select=",r=await fetch(base+"created_at,name,quote,rating,image_path,image_bucket",{headers:hd});
+if(!r.ok)r=await fetch(base+"created_at,name,quote,rating,image_path",{headers:hd});
+if(r.ok){list=await r.json();ok=true}}catch(e){}}
+var rg=document.getElementById("rgrid"),hg=document.getElementById("hgrid"),sm=document.getElementById("rsum");
+if(live)document.getElementById("tsec").hidden=false;
+if(!ok){note(rg,live?"Reviews could not load right now. Please try again in a moment.":"Reviews will appear here once the site is connected.");note(hg,"Read what customers say about us.")}
+else if(!list.length){note(rg,"No reviews yet. Be the first to share your experience below.");note(hg,"No reviews yet. Be the first to share your experience.")}
+else{rg.innerHTML="";hg.innerHTML="";
+list.forEach(function(t){rg.appendChild(card(t))});
+list.slice(0,3).forEach(function(t){hg.appendChild(card(t))});
+var avg=list.reduce(function(a,t){return a+t.rating},0)/list.length;
+sm.hidden=false;sm.innerHTML="";var big=document.createElement("span");big.className="big";big.textContent=avg.toFixed(1);
+var st=document.createElement("span");st.className="st";st.setAttribute("aria-label","Average "+avg.toFixed(1)+" out of 5");st.textContent=stars(Math.round(avg));
+var ct=document.createElement("span");ct.className="note";ct.textContent="from "+list.length+(list.length==1?" review":" reviews");
+sm.appendChild(big);sm.appendChild(st);sm.appendChild(ct)}
+var pf=document.getElementById("pfile"),pv=document.getElementById("pprev");
+pf.addEventListener("change",function(){if(pv.dataset.u){URL.revokeObjectURL(pv.dataset.u);pv.dataset.u=""}
+if(pf.files[0]){var u=URL.createObjectURL(pf.files[0]);pv.dataset.u=u;pv.src=u;pv.style.display="block"}else{pv.style.display="none"}});
+document.getElementById("rform").addEventListener("submit",async function(e){e.preventDefault();
+var f=e.target,m=document.getElementById("tmsg"),b=f.querySelector("button[type=submit]");
+if(f.website.value){m.textContent="Thank you! Lee will read your review before it appears.";f.reset();return}
+if(!live){m.textContent="Reviews are not connected yet.";return}
+if(!f.r.value){m.textContent="Please choose a star rating.";return}
+b.disabled=true;m.textContent="Sending…";var sent=false,path=null,bad=false;
 try{if(f.p.files[0]){var blob=await shrinkImg(f.p.files[0]);path="r-"+Date.now().toString(36)+"-"+Math.random().toString(36).slice(2,10)+".jpg";
 var u=await fetch(SUPABASE_URL+"/storage/v1/object/review-photos/"+path,{method:"POST",headers:{apikey:SUPABASE_KEY,Authorization:"Bearer "+SUPABASE_KEY,"Content-Type":"image/jpeg"},body:blob});if(!u.ok){bad=true;path=null}}}catch(er){bad=true;path=null}
-if(bad){b.disabled=false;m.textContent="Sorry, your photo could not be uploaded. Try a different photo, or send your review without one.";return}
+if(bad){b.disabled=false;m.textContent="Your photo could not be uploaded. Try a different photo, or send your review without one.";return}
 try{var row={name:f.n.value.trim(),quote:f.q.value.trim(),rating:parseInt(f.r.value,10),status:"pending",source:"customer"};if(path){row.image_path=path;row.image_bucket="review-photos"}
-var x=await fetch(SUPABASE_URL+"/rest/v1/testimonials",{method:"POST",headers:Object.assign({"Content-Type":"application/json",Prefer:"return=minimal"},hd),body:JSON.stringify(row)});ok=x.ok}catch(er){}
-b.disabled=false;m.textContent=ok?"Thank you! Lee will read your review before it appears.":"Sorry, your review could not be sent. Please try again.";if(ok){f.reset();setTimeout(function(){f.hidden=true},2500)}})}catch(e){}})();
+var x=await fetch(SUPABASE_URL+"/rest/v1/testimonials",{method:"POST",headers:Object.assign({"Content-Type":"application/json",Prefer:"return=minimal"},hd),body:JSON.stringify(row)});sent=x.ok}catch(er){}
+b.disabled=false;m.textContent=sent?"Thank you! Lee will read your review before it appears.":"Your review could not be sent. Check your connection and try again.";
+if(sent){f.reset();pv.style.display="none"}})})();
 function shrinkImg(file){return new Promise(function(ok,no){var im=new Image();im.onload=function(){var s=Math.min(1,900/Math.max(im.width,im.height)),c=document.createElement("canvas");c.width=Math.round(im.width*s);c.height=Math.round(im.height*s);c.getContext("2d").drawImage(im,0,0,c.width,c.height);c.toBlob(function(b){b?ok(b):no()},"image/jpeg",.8)};im.onerror=no;im.src=URL.createObjectURL(file)})}
 function wa(txt){window.open("https://wa.me/"+WANUM+"?text="+encodeURIComponent(txt),"_blank")}
-var SUPABASE_URL="https://nuwkbazgurvokrtuxpfo.supabase.co",SUPABASE_KEY="sb_publishable_lJKvl1NROvMtALbSkDkUag_X3Rhgsvk";
 function normNum(v){v=String(v).replace(/\D/g,"");return v.indexOf("233")==0?v:v.replace(/^0/,"233")}
 document.addEventListener("click",function(e){var a=e.target.closest&&e.target.closest("a[href*='wa.me/']");if(a&&WANUM!=OLDNUM)a.href=a.href.replace("wa.me/"+OLDNUM,"wa.me/"+WANUM)},true);
 (async function(){try{if(SUPABASE_URL.indexOf("PASTE")==0)return;
