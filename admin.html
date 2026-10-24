@@ -149,7 +149,7 @@ if(me.role=="admin"){$("tt").hidden=false;$("ts").hidden=false;$("tp").hidden=fa
 load()}
 function show(t){["b","t","p","v","g","r","s"].forEach(function(k){var p={b:"pb",t:"pt",p:"pp",v:"pv",g:"pg",r:"pr",s:"ps"}[k],q={b:"tb",t:"tt",p:"tp",v:"tv",g:"tgal",r:"tr",s:"ts"}[k];$(p).hidden=k!=t;$(q).classList.toggle("on",k==t)});if(t=="t")loadTeam();if(t=="s")loadSettings();if(t=="p")loadProducts();if(t=="v")loadServices();if(t=="g")loadGallery();if(t=="r")loadReviews()}
 $("tb").onclick=function(){show("b")};$("tt").onclick=function(){show("t")};$("ts").onclick=function(){show("s")};$("tp").onclick=function(){show("p")};$("tv").onclick=function(){show("v")};$("tgal").onclick=function(){show("g")};$("tr").onclick=function(){show("r")};
-async function load(){var r=await fetch(URL_+"/rest/v1/team_bookings?order=created_at.desc",{headers:H()});
+async function load(){var r=await fetch(URL_+"/rest/v1/rpc/get_team_bookings",{method:"POST",headers:H(),body:"{}"});
 if(r.status==401){location.reload();return}all=await r.json();draw()}
 function draw(){var today=new Date().toISOString().slice(0,10),c=function(s){return all.filter(function(b){return b.status==s}).length};
 $("stats").innerHTML=[["New",c("new")],["Confirmed",c("confirmed")],["Today",all.filter(function(b){return b.date==today&&b.status!="cancelled"}).length],["All time",all.length]].map(function(x){return '<div class="stat"><b>'+x[1]+'</b><span>'+x[0]+'</span></div>'}).join("");

@@ -61,21 +61,27 @@ create policy "Admin removes people" on public.profiles for delete to authentica
 alter table public.profiles add column if not exists see_phone boolean not null default false;
 alter table public.profiles add column if not exists see_notes boolean not null default false;
 
--- Team members never read the bookings table directly. They read this view, which hides
+-- Team members never read the bookings table directly. They call this function, which hides
 -- phone numbers and notes unless an admin switched them on for that person (admins always see all).
-create or replace view public.team_bookings as
-select b.id, b.created_at, b.name, b.service, b.date, b.time, b.status,
-  case when p.role = 'admin' or p.see_phone then b.phone end as phone,
-  case when p.role = 'admin' or p.see_notes then b.notes end as notes
-from public.bookings b
-join public.profiles p on p.id = auth.uid() and p.role in ('viewer','staff','admin');
+drop view if exists public.team_bookings;
+create or replace function public.get_team_bookings()
+returns table (id uuid, created_at timestamptz, name text, service text, "date" date, "time" text, status text, phone text, notes text)
+language sql stable security definer set search_path = public as $$
+  select b.id, b.created_at, b.name, b.service, b."date", b."time", b.status,
+    case when p.role = 'admin' or p.see_phone then b.phone end,
+    case when p.role = 'admin' or p.see_notes then b.notes end
+  from public.bookings b
+  join public.profiles p on p.id = auth.uid() and p.role in ('viewer','staff','admin')
+  order by b.created_at desc
+$$;
+revoke execute on function public.get_team_bookings() from public, anon;
+grant execute on function public.get_team_bookings() to authenticated;
 
 drop policy if exists "Team can read" on public.bookings;
 drop policy if exists "Staff can update" on public.bookings;
 drop policy if exists "Admin can delete" on public.bookings;
 revoke select, update, delete on public.bookings from anon, authenticated;
 grant insert on public.bookings to anon;
-grant select on public.team_bookings to authenticated;
 
 create or replace function public.set_booking_status(bid uuid, s text) returns void
 language plpgsql security definer set search_path = public as $$
@@ -190,7 +196,6 @@ insert into public.settings (key, value) values
 on conflict (key) do nothing;
 
 -- Hardening: the public site key can only do what is listed here
-revoke all on public.team_bookings from anon;
 alter table public.bookings drop constraint if exists bookings_length_check;
 alter table public.bookings add constraint bookings_length_check check (
   char_length(name) between 1 and 100 and char_length(coalesce(phone,'')) <= 30 and
