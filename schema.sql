@@ -35,6 +35,11 @@ end $$;
 drop trigger if exists on_auth_user_created on auth.users;
 create trigger on_auth_user_created after insert on auth.users for each row execute function public.handle_new_user();
 
+-- Make this file safe to run again
+drop policy if exists "Read own or admin" on public.profiles;
+drop policy if exists "Admin sets roles" on public.profiles;
+drop policy if exists "Admin removes people" on public.profiles;
+
 -- Clear any older policies
 drop policy if exists "Anyone can book" on public.bookings;
 drop policy if exists "Admin can read" on public.bookings;
@@ -190,3 +195,43 @@ alter table public.bookings drop constraint if exists bookings_length_check;
 alter table public.bookings add constraint bookings_length_check check (
   char_length(name) between 1 and 100 and char_length(coalesce(phone,'')) <= 30 and
   char_length(coalesce(service,'')) <= 60 and char_length(coalesce(notes,'')) <= 500 and char_length(coalesce(time,'')) <= 10);
+
+-- Testimonials: customers submit (pending), Lee approves. Only approved ones are public.
+create table if not exists public.testimonials (
+  id uuid primary key default gen_random_uuid(),
+  created_at timestamptz not null default now(),
+  name text not null, quote text not null, rating int not null default 5,
+  image_path text,
+  status text not null default 'pending' check (status in ('pending','approved','rejected')),
+  source text not null default 'customer' check (source in ('customer','admin')),
+  constraint testimonials_len check (char_length(name) between 1 and 60 and char_length(quote) between 5 and 400 and rating between 1 and 5)
+);
+alter table public.testimonials enable row level security;
+drop policy if exists "Public reads approved testimonials" on public.testimonials;
+drop policy if exists "Customers submit testimonials" on public.testimonials;
+drop policy if exists "Admin adds testimonials" on public.testimonials;
+drop policy if exists "Admin edits testimonials" on public.testimonials;
+drop policy if exists "Admin removes testimonials" on public.testimonials;
+create policy "Public reads approved testimonials" on public.testimonials for select to anon, authenticated using (status = 'approved' or public.my_role() = 'admin');
+create policy "Customers submit testimonials" on public.testimonials for insert to anon with check (status = 'pending' and source = 'customer' and image_path is null);
+create policy "Admin adds testimonials" on public.testimonials for insert to authenticated with check (public.my_role() = 'admin');
+create policy "Admin edits testimonials" on public.testimonials for update to authenticated using (public.my_role() = 'admin') with check (public.my_role() = 'admin');
+create policy "Admin removes testimonials" on public.testimonials for delete to authenticated using (public.my_role() = 'admin');
+
+-- Customer photos on reviews: stored in their own bucket, hidden from the public until the review is approved
+alter table public.testimonials add column if not exists image_bucket text not null default 'product-images';
+drop policy if exists "Customers submit testimonials" on public.testimonials;
+create policy "Customers submit testimonials" on public.testimonials for insert to anon with check (
+  status = 'pending' and source = 'customer' and (
+    image_path is null or (image_bucket = 'review-photos' and image_path ~ '^r-[a-z0-9-]{10,60}[.]jpg$')));
+
+insert into storage.buckets (id, name, public, file_size_limit, allowed_mime_types)
+values ('review-photos','review-photos', true, 1048576, array['image/jpeg'])
+on conflict (id) do nothing;
+drop policy if exists "Customers upload review photos" on storage.objects;
+drop policy if exists "Admin views review photos" on storage.objects;
+drop policy if exists "Admin deletes review photos" on storage.objects;
+create policy "Customers upload review photos" on storage.objects for insert to anon, authenticated
+  with check (bucket_id = 'review-photos' and name ~ '^r-[a-z0-9-]{10,60}[.]jpg$');
+create policy "Admin views review photos" on storage.objects for select to authenticated using (bucket_id = 'review-photos' and public.my_role() = 'admin');
+create policy "Admin deletes review photos" on storage.objects for delete to authenticated using (bucket_id = 'review-photos' and public.my_role() = 'admin');

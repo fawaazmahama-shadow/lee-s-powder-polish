@@ -37,3 +37,9 @@ On the Settings tab admins can also edit the Home page headline and intro, and t
 ABOUT THE KEY IN THE PAGE
 The Project URL and the anon (publishable) key are meant to be public. Anyone can see them in the browser; that is normal. Security comes from the database rules in schema.sql, not from hiding the key.
 NEVER paste the service_role key, the database password or any "secret" key into these files.
+
+REVIEWS
+Customers can send a review (name, 1-5 stars, text) from the Home page. It waits as "pending" until an admin approves it on the Reviews tab. Admins can also add their own reviews, attach a photo of the work, hide or delete any review. Customers can attach one optional photo (shrunk automatically, stored in the review-photos bucket, public only if the review is approved). Admins can replace or remove it when editing.
+
+PHOTO CLEAN-UP
+If a customer uploads a photo but never finishes the form, the file stays in the review-photos bucket. Every few months open Supabase > Storage > review-photos and delete files that are not on an approved review. To limit abuse, turn on CAPTCHA protection (Authentication > Attack Protection) if you notice spam.
