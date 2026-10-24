@@ -98,6 +98,15 @@ footer{border-top:1px solid var(--line);background:var(--bg2);padding:2.5rem 1.2
 .rate input:checked~label,.rate label:hover,.rate label:hover~label{color:var(--gold)}
 .rate input:focus-visible+label{outline:2px solid var(--gold);outline-offset:2px}
 #pprev{display:none;width:120px;aspect-ratio:1;object-fit:cover;border:1px solid var(--gold)}
+
+.upin{position:absolute;opacity:0;width:1px;height:1px;pointer-events:none}
+.upz{display:flex;align-items:center;gap:.9rem;border:1px dashed var(--gold);background:var(--bg2);padding:.9rem 1.1rem;cursor:pointer;color:var(--fg);font-weight:400;min-height:64px;text-align:left}
+.upz:hover,.upz.drag{background:color-mix(in srgb,var(--gold) 16%,var(--bg2))}
+.upz.has{border-style:solid}
+.upz svg{flex:none;width:30px;height:30px;fill:none;stroke:var(--gold);stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
+.upz b{display:block;font-weight:500;overflow-wrap:anywhere}.upz small{display:block;color:var(--mut);font-size:.88rem;line-height:1.35}
+.upin:focus-visible+.upz{outline:2px solid var(--gold);outline-offset:2px}
+.row .upz{flex:1;min-width:220px}
 </style>
 </head>
 <body>
@@ -122,9 +131,6 @@ footer{border-top:1px solid var(--line);background:var(--bg2);padding:2.5rem 1.2
 <div class="card"><h3>Makeup</h3><p>Looks for class, dates, birthdays and photos.</p></div>
 <div class="card"><h3>Skincare</h3><p>Products you can buy and collect on campus.</p></div>
 </div></section>
-<section id="tsec" hidden><h2>What customers say</h2>
-<div class="grid" id="hgrid"></div>
-<div class="btns"><a class="btn" href="#reviews">Read all reviews or leave yours</a></div></section>
 <section><h2>Opening hours</h2><p data-s="hours" style="font-size:1.25rem;margin:0 0 .4rem">Mon to Sun, 8am to 10pm</p>
 <p class="note">Message us on WhatsApp to confirm your slot.</p>
 <div class="btns"><a class="btn gold" href="https://wa.me/233596139168?text=Hello%20Lee%E2%80%99s%20Powder%20%26%20Polish%2C%20I%E2%80%99d%20like%20to%20book." target="_blank" rel="noopener">Chat on WhatsApp</a>
@@ -283,13 +289,11 @@ var list=[],ok=false;
 if(live){try{var base=SUPABASE_URL+"/rest/v1/testimonials?status=eq.approved&order=created_at.desc&limit=200&select=",r=await fetch(base+"created_at,name,quote,rating,image_path,image_bucket",{headers:hd});
 if(!r.ok)r=await fetch(base+"created_at,name,quote,rating,image_path",{headers:hd});
 if(r.ok){list=await r.json();ok=true}}catch(e){}}
-var rg=document.getElementById("rgrid"),hg=document.getElementById("hgrid"),sm=document.getElementById("rsum");
-if(live)document.getElementById("tsec").hidden=false;
-if(!ok){note(rg,live?"Reviews could not load right now. Please try again in a moment.":"Reviews will appear here once the site is connected.");note(hg,"Read what customers say about us.")}
-else if(!list.length){note(rg,"No reviews yet. Be the first to share your experience below.");note(hg,"No reviews yet. Be the first to share your experience.")}
-else{rg.innerHTML="";hg.innerHTML="";
+var rg=document.getElementById("rgrid"),sm=document.getElementById("rsum");
+if(!ok){note(rg,live?"Reviews could not load right now. Please try again in a moment.":"Reviews will appear here once the site is connected.")}
+else if(!list.length){note(rg,"No reviews yet. Be the first to share your experience below.")}
+else{rg.innerHTML="";
 list.forEach(function(t){rg.appendChild(card(t))});
-list.slice(0,3).forEach(function(t){hg.appendChild(card(t))});
 var avg=list.reduce(function(a,t){return a+t.rating},0)/list.length;
 sm.hidden=false;sm.innerHTML="";var big=document.createElement("span");big.className="big";big.textContent=avg.toFixed(1);
 var st=document.createElement("span");st.className="st";st.setAttribute("aria-label","Average "+avg.toFixed(1)+" out of 5");st.textContent=stars(Math.round(avg));
@@ -337,6 +341,23 @@ try{var s=localStorage.getItem("lpp-theme");if(s)r.setAttribute("data-theme",s)}
 document.getElementById("tg").addEventListener("click",function(){
 var dark=r.getAttribute("data-theme")?r.getAttribute("data-theme")==="dark":!matchMedia("(prefers-color-scheme:light)").matches;
 var n=dark?"light":"dark";r.setAttribute("data-theme",n);try{localStorage.setItem("lpp-theme",n)}catch(e){}});
+</script>
+<script>
+(function(){var ICON='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/></svg>';
+document.querySelectorAll('input[type=file]').forEach(function(inp){
+var multi=inp.multiple,z=document.createElement(inp.closest('label')?'span':'label');
+if(z.tagName=='LABEL')z.htmlFor=inp.id;z.className='upz';inp.classList.add('upin');inp.parentNode.insertBefore(z,inp.nextSibling);
+var last=-1;
+function draw(){var n=inp.files?inp.files.length:0;if(n===last&&z.firstChild)return;last=n;z.classList.toggle('has',n>0);
+var t=n?(n==1?inp.files[0].name:n+' photos selected'):(multi?'Choose photos':'Choose a photo'),
+h=n?'Tap or click to change':'Tap or click to browse, or drop '+(multi?'photos':'one')+' here';
+z.innerHTML=ICON+'<span><b></b><small></small></span>';z.querySelector('b').textContent=t;z.querySelector('small').textContent=h}
+draw();inp.addEventListener('change',draw);setInterval(draw,400);
+['dragenter','dragover'].forEach(function(ev){z.addEventListener(ev,function(e){e.preventDefault();z.classList.add('drag')})});
+['dragleave','drop'].forEach(function(ev){z.addEventListener(ev,function(e){e.preventDefault();z.classList.remove('drag')})});
+z.addEventListener('drop',function(e){var fs=[].filter.call(e.dataTransfer.files,function(f){return/^image\//.test(f.type)});if(!fs.length)return;
+var dt=new DataTransfer();(multi?fs:[fs[0]]).forEach(function(f){dt.items.add(f)});inp.files=dt.files;inp.dispatchEvent(new Event('change',{bubbles:true}))});
+});})();
 </script>
 </body>
 </html>
